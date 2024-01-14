@@ -1,11 +1,18 @@
+using System;
 
-<Project Sdk="Microsoft.NET.Sdk">
+class Program
+{
+    static void Main()
+    {
+        // Prompt for first name
+        Console.Write("What is your first name? ");
+        string firstName = Console.ReadLine();
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
+        // Prompt for last name
+        Console.Write("What is your last name? ");
+        string lastName = Console.ReadLine();
 
-</Project>
+        // Display the formatted result
+        Console.WriteLine($"Your name is {lastName}, {firstName} {lastName}.");
+    }
+}
