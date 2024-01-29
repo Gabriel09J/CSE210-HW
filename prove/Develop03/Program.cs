@@ -1,36 +1,69 @@
 import random
 
-def hide_words(scripture):
-    words = scripture.split()
-    hidden_indices = set()
+class Word:
+    def __init__(self, text):
+        self.text = text
 
-    while len(hidden_indices) < len(words):
-        index = random.randint(0, len(words) - 1)
-        hidden_indices.add(index)
+    def hide(self):
+        return '*' * len(self.text)
 
-    hidden_scripture = ' '.join(['*' * len(words[i]) if i in hidden_indices else words[i] for i in range(len(words))])
-    return hidden_scripture
+class Reference:
+    def __init__(self, book, chapter, start_verse, end_verse=None):
+        self.book = book
+        self.chapter = chapter
+        self.start_verse = start_verse
+        self.end_verse = end_verse
 
-def main():
-    scripture = {
-        "reference": "John 3:16",
-        "text": "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."
-    }
+    def __str__(self):
+        if self.end_verse:
+            return f"{self.book} {self.chapter}:{self.start_verse}-{self.end_verse}"
+        else:
+            return f"{self.book} {self.chapter}:{self.start_verse}"
 
-    while True:
-        input("Press Enter to continue or type 'quit' to exit: ")
-        
-        if input().lower() == 'quit':
-            break
+class Scripture:
+    def __init__(self, reference, text):
+        self.reference = reference
+        self.words = [Word(word) for word in text.split()]
 
-        console_clear()
-        hidden_scripture = hide_words(scripture["text"])
-        print(f"{scripture['reference']} - {hidden_scripture}")
+    def hide_words(self):
+        hidden_indices = set()
 
-    print("Program ended.")
+        while len(hidden_indices) < len(self.words):
+            index = random.randint(0, len(self.words) - 1)
+            hidden_indices.add(index)
 
-def console_clear():
-    print("\033c", end="")  # ANSI escape code to clear console
+        for index in hidden_indices:
+            self.words[index] = Word(self.words[index].hide())
+
+    def is_all_hidden(self):
+        return all(word.text.startswith('*') for word in self.words)
+
+    def display(self):
+        hidden_scripture = ' '.join([word.text for word in self.words])
+        print(f"{self.reference} - {hidden_scripture}")
+
+class Program:
+    @staticmethod
+    def main():
+        scripture_reference = Reference(book="John", chapter=3, start_verse=16)
+        scripture_text = "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."
+        scripture = Scripture(reference=scripture_reference, text=scripture_text)
+
+        while not scripture.is_all_hidden():
+            input("Press Enter to continue or type 'quit' to exit: ")
+
+            if input().lower() == 'quit':
+                break
+
+            console_clear()
+            scripture.hide_words()
+            scripture.display()
+
+        print("Program ended.")
+
+    @staticmethod
+    def console_clear():
+        print("\033c", end="")  # ANSI escape code to clear console
 
 if __name__ == "__main__":
-    main()
+    Program.main()
