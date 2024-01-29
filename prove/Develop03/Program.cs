@@ -1,127 +1,36 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+import random
 
-class Program
-{
-    static void Main()
-    {
-        Reference john316 = new Reference("John", 3, 16);
-        Scripture scripture = new Scripture(john316, "For God so loved the world...");
-        Console.Clear();
-        Console.WriteLine(scripture.GetDisplayText());
+def hide_words(scripture):
+    words = scripture.split()
+    hidden_indices = set()
 
-        while (!scripture.IsCompletelyHidden())
-        {
-            Console.WriteLine("Press Enter to hide a word or type 'quit' to exit:");
-            string input = Console.ReadLine();
+    while len(hidden_indices) < len(words):
+        index = random.randint(0, len(words) - 1)
+        hidden_indices.add(index)
 
-            if (input.ToLower() == "quit")
-                break;
+    hidden_scripture = ' '.join(['*' * len(words[i]) if i in hidden_indices else words[i] for i in range(len(words))])
+    return hidden_scripture
 
-            if (int.TryParse(input, out int wordsToHide))
-            {
-                scripture.HideRandomWords(wordsToHide);
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter a number or 'quit'.");
-            }
-
-            Console.Clear();
-            Console.WriteLine(scripture.GetDisplayText());
-        }
-
-        Console.WriteLine("Program ended.");
-    }
-}
-
-class Scripture
-{
-    private readonly Reference _reference;
-    private readonly List<Word> _words;
-
-    public Scripture(Reference reference, string text)
-    {
-        _reference = reference;
-        _words = text.Split(' ').Select(word => new Word(word)).ToList();
+def main():
+    scripture = {
+        "reference": "John 3:16",
+        "text": "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."
     }
 
-    public void HideRandomWords(int numberToHide)
-    {
-        Random rand = new Random();
-        for (int i = 0; i < numberToHide; i++)
-        {
-            Word randomWord = _words[rand.Next(_words.Count)];
-            randomWord.Hide();
-        }
-    }
+    while True:
+        input("Press Enter to continue or type 'quit' to exit: ")
+        
+        if input().lower() == 'quit':
+            break
 
-    public bool IsCompletelyHidden()
-    {
-        return _words.All(word => word.IsHidden());
-    }
+        console_clear()
+        hidden_scripture = hide_words(scripture["text"])
+        print(f"{scripture['reference']} - {hidden_scripture}")
 
-    public string GetDisplayText()
-    {
-        return $"{_reference.GetDisplayText()}\n{string.Join(" ", _words.Select(word => word.GetDisplayText()))}";
-    }
-}
+    print("Program ended.")
 
-class Word
-{
-    private readonly string _text;
-    private bool _isHidden;
+def console_clear():
+    print("\033c", end="")  # ANSI escape code to clear console
 
-    public Word(string text)
-    {
-        _text = text;
-        _isHidden = false;
-    }
-
-    public void Hide()
-    {
-        _isHidden = true;
-    }
-
-    public bool IsHidden()
-    {
-        return _isHidden;
-    }
-
-    public string GetDisplayText()
-    {
-        return _isHidden ? "_____" : _text;
-    }
-}
-
-class Reference
-{
-    private readonly string _book;
-    private readonly int _chapter;
-    private readonly int _verse;
-    private readonly int? _endVerse;
-
-    public Reference(string book, int chapter, int verse)
-    {
-        _book = book;
-        _chapter = chapter;
-        _verse = verse;
-        _endVerse = null;
-    }
-
-    public Reference(string book, int chapter, int startVerse, int endVerse)
-    {
-        _book = book;
-        _chapter = chapter;
-        _verse = startVerse;
-        _endVerse = endVerse;
-    }
-
-    public string GetDisplayText()
-    {
-        return _endVerse == null
-            ? $"{_book} {_chapter}:{_verse}"
-            : $"{_book} {_chapter}:{_verse}-{_endVerse}";
-    }
-}
+if __name__ == "__main__":
+    main()
