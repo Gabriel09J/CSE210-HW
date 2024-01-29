@@ -1,89 +1,76 @@
 import random
 import datetime
+import json
 
-class Entry:
+class JournalEntry:
     def __init__(self, prompt, response, date):
         self.prompt = prompt
         self.response = response
         self.date = date
 
-class Journal:
+class DailyJournal:
     def __init__(self):
         self.entries = []
 
-    def add_entry(self, entry):
-        self.entries.append(entry)
-
-    def display_entries(self):
-        for entry in self.entries:
-            print(f"\nDate: {entry.date}\nPrompt: {entry.prompt}\nResponse: {entry.response}")
-
-    def save_to_file(self, filename):
-        with open(filename, "w") as file:
-            for entry in self.entries:
-                file.write(f"{entry.date}, {entry.prompt}, {entry.response}\n")
-
-    def load_from_file(self, filename):
-        self.entries = []
-        with open(filename, "r") as file:
-            for line in file:
-                date, prompt, response = line.strip().split(', ')
-                self.entries.append(Entry(prompt, response, date))
-
-class Program:
-    def __init__(self):
-        self.journal = Journal()
-        self.prompts = [
+    def write_new_entry(self):
+        prompts = [
             "Who was the most interesting person I interacted with today?",
             "What was the best part of my day?",
             "How did I see the hand of the Lord in my life today?",
             "What was the strongest emotion I felt today?",
             "If I had one thing I could do over today, what would it be?"
         ]
-
-    def write_new_entry(self):
-        prompt = random.choice(self.prompts)
+        prompt = random.choice(prompts)
         response = input(f"{prompt}\nYour response: ")
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-        entry = Entry(prompt, response, date)
-        self.journal.add_entry(entry)
+        date = datetime.date.today().strftime("%Y-%m-%d")
+        entry = JournalEntry(prompt, response, date)
+        self.entries.append(entry)
+        print("\nEntry added successfully.")
 
     def display_journal(self):
-        self.journal.display_entries()
+        if not self.entries:
+            print("No entries to display.")
+        else:
+            for entry in self.entries:
+                print(f"\nDate: {entry.date}\nPrompt: {entry.prompt}\nResponse: {entry.response}")
 
-    def save_journal(self):
-        filename = input("Enter the filename to save the journal: ")
-        self.journal.save_to_file(filename)
+    def save_to_file(self, filename):
+        with open(filename, 'w') as file:
+            entries_data = [{'prompt': entry.prompt, 'response': entry.response, 'date': entry.date} for entry in self.entries]
+            json.dump(entries_data, file)
+        print("\nJournal saved successfully.")
 
-    def load_journal(self):
-        filename = input("Enter the filename to load the journal from: ")
-        self.journal.load_from_file(filename)
+    def load_from_file(self, filename):
+        try:
+            with open(filename, 'r') as file:
+                entries_data = json.load(file)
+                self.entries = [JournalEntry(entry['prompt'], entry['response'], entry['date']) for entry in entries_data]
+            print("\nJournal loaded successfully.")
+        except FileNotFoundError:
+            print("\nFile not found. Creating a new journal.")
 
-    def run(self):
-        while True:
-            print("\n1. Write a new entry")
-            print("2. Display the journal")
-            print("3. Save the journal to a file")
-            print("4. Load the journal from a file")
-            print("5. Quit")
+def main():
+    journal = DailyJournal()
 
-            choice = input("Enter your choice (1-5): ")
+    while True:
+        print("\n1. Write a new entry\n2. Display the journal\n3. Save the journal to a file\n4. Load the journal from a file\n5. Exit")
+        choice = input("Choose an option: ")
 
-            if choice == "1":
-                self.write_new_entry()
-
-            elif choice == "2":
-                self.display_journal()
-
-            elif choice == "3":
-                self.save_journal()
-
-            elif choice == "4":
-                self.load_journal()
-
-            elif choice == "5":
-                break
+        if choice == '1':
+            journal.write_new_entry()
+        elif choice == '2':
+            journal.display_journal()
+        elif choice == '3':
+            filename = input("Enter the filename to save the journal: ")
+            journal.save_to_file(filename)
+        elif choice == '4':
+            filename = input("Enter the filename to load the journal: ")
+            journal.load_from_file(filename)
+        elif choice == '5':
+            print("Exiting the program.")
+            break
+        else:
+            print("Invalid choice. Please choose a valid option.")
 
 if __name__ == "__main__":
-    program = Program()
-    program.run()
+    main()
