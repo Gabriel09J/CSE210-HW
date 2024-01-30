@@ -52,10 +52,11 @@ class Program:
         while not scripture.is_all_hidden():
             input("Press Enter to continue or type 'quit' to exit: ")
 
-            if input().lower() == 'quit':
+            user_input = input().lower()
+            if user_input == 'quit':
                 break
 
-            console_clear()
+            Program.console_clear()
             scripture.hide_words()
             scripture.display()
 
