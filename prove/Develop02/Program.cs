@@ -1,76 +1,146 @@
-import random
-import datetime
-import json
+using System;
+using System.Collections.Generic;
+using System.IO;
 
-class JournalEntry:
-    def __init__(self, prompt, response, date):
-        self.prompt = prompt
-        self.response = response
-        self.date = date
+class Program
+{
+    static List<Entry> journal = new List<Entry>();
+    static List<string> prompts = new List<string>
+    {
+        "Who was the most interesting person I interacted with today?",
+        "What was the best part of my day?",
+        "How did I see the hand of the Lord in my life today?",
+        "What was the strongest emotion I felt today?",
+        "If I had one thing I could do over today, what would it be?"
+    };
 
-class DailyJournal:
-    def __init__(self):
-        self.entries = []
+    static void Main()
+    {
+        bool exit = false;
 
-    def write_new_entry(self):
-        prompts = [
-            "Who was the most interesting person I interacted with today?",
-            "What was the best part of my day?",
-            "How did I see the hand of the Lord in my life today?",
-            "What was the strongest emotion I felt today?",
-            "If I had one thing I could do over today, what would it be?"
-        ]
-        prompt = random.choice(prompts)
-        response = input(f"{prompt}\nYour response: ")
-        date = datetime.date.today().strftime("%Y-%m-%d")
-        entry = JournalEntry(prompt, response, date)
-        self.entries.append(entry)
-        print("\nEntry added successfully.")
+        while (!exit)
+        {
+            Console.WriteLine("1. Write a new entry");
+            Console.WriteLine("2. Display the journal");
+            Console.WriteLine("3. Save the journal to a file");
+            Console.WriteLine("4. Load the journal from a file");
+            Console.WriteLine("5. Exit");
 
-    def display_journal(self):
-        if not self.entries:
-            print("No entries to display.")
-        else:
-            for entry in self.entries:
-                print(f"\nDate: {entry.date}\nPrompt: {entry.prompt}\nResponse: {entry.response}")
+            Console.Write("Choose an option: ");
+            string choice = Console.ReadLine();
 
-    def save_to_file(self, filename):
-        with open(filename, 'w') as file:
-            entries_data = [{'prompt': entry.prompt, 'response': entry.response, 'date': entry.date} for entry in self.entries]
-            json.dump(entries_data, file)
-        print("\nJournal saved successfully.")
+            switch (choice)
+            {
+                case "1":
+                    WriteNewEntry();
+                    break;
 
-    def load_from_file(self, filename):
-        try:
-            with open(filename, 'r') as file:
-                entries_data = json.load(file)
-                self.entries = [JournalEntry(entry['prompt'], entry['response'], entry['date']) for entry in entries_data]
-            print("\nJournal loaded successfully.")
-        except FileNotFoundError:
-            print("\nFile not found. Creating a new journal.")
+                case "2":
+                    DisplayJournal();
+                    break;
 
-def main():
-    journal = DailyJournal()
+                case "3":
+                    SaveJournal();
+                    break;
 
-    while True:
-        print("\n1. Write a new entry\n2. Display the journal\n3. Save the journal to a file\n4. Load the journal from a file\n5. Exit")
-        choice = input("Choose an option: ")
+                case "4":
+                    LoadJournal();
+                    break;
 
-        if choice == '1':
-            journal.write_new_entry()
-        elif choice == '2':
-            journal.display_journal()
-        elif choice == '3':
-            filename = input("Enter the filename to save the journal: ")
-            journal.save_to_file(filename)
-        elif choice == '4':
-            filename = input("Enter the filename to load the journal: ")
-            journal.load_from_file(filename)
-        elif choice == '5':
-            print("Exiting the program.")
-            break
-        else:
-            print("Invalid choice. Please choose a valid option.")
+                case "5":
+                    exit = true;
+                    break;
 
-if __name__ == "__main__":
-    main()
+                default:
+                    Console.WriteLine("Invalid option. Please choose again.");
+                    break;
+            }
+        }
+    }
+
+    static void WriteNewEntry()
+    {
+        string prompt = prompts[new Random().Next(prompts.Count)];
+        Console.WriteLine("Prompt: " + prompt);
+        Console.Write("Your response: ");
+        string response = Console.ReadLine();
+
+        Entry entry = new Entry
+        {
+            Date = DateTime.Now,
+            Prompt = prompt,
+            Response = response
+        };
+
+        journal.Add(entry);
+        Console.WriteLine("Entry added successfully.");
+    }
+
+    static void DisplayJournal()
+    {
+        foreach (var entry in journal)
+        {
+            Console.WriteLine($"Date: {entry.Date}, Prompt: {entry.Prompt}, Response: {entry.Response}");
+        }
+    }
+
+    static void SaveJournal()
+    {
+        Console.Write("Enter the filename to save the journal: ");
+        string filename = Console.ReadLine();
+
+        using (StreamWriter writer = new StreamWriter(filename))
+        {
+            foreach (var entry in journal)
+            {
+                writer.WriteLine($"{entry.Date},{entry.Prompt},{entry.Response}");
+            }
+        }
+
+        Console.WriteLine("Journal saved successfully.");
+    }
+
+    static void LoadJournal()
+    {
+        Console.Write("Enter the filename to load the journal from: ");
+        string filename = Console.ReadLine();
+
+        if (File.Exists(filename))
+        {
+            journal.Clear();
+
+            using (StreamReader reader = new StreamReader(filename))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string[] entryData = reader.ReadLine().Split(',');
+                    DateTime date = DateTime.Parse(entryData[0]);
+                    string prompt = entryData[1];
+                    string response = entryData[2];
+
+                    Entry entry = new Entry
+                    {
+                        Date = date,
+                        Prompt = prompt,
+                        Response = response
+                    };
+
+                    journal.Add(entry);
+                }
+            }
+
+            Console.WriteLine("Journal loaded successfully.");
+        }
+        else
+        {
+            Console.WriteLine("File not found. Please enter a valid filename.");
+        }
+    }
+}
+
+class Entry
+{
+    public DateTime Date { get; set; }
+    public string Prompt { get; set; }
+    public string Response { get; set; }
+}
