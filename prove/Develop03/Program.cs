@@ -1,70 +1,117 @@
-import random
+using System;
+using System.Collections.Generic;
 
-class Word:
-    def __init__(self, text):
-        self.text = text
+class Word
+{
+    public string Text { get; set; }
 
-    def hide(self):
-        return '*' * len(self.text)
+    public Word(string text)
+    {
+        Text = text;
+    }
 
-class Reference:
-    def __init__(self, book, chapter, start_verse, end_verse=None):
-        self.book = book
-        self.chapter = chapter
-        self.start_verse = start_verse
-        self.end_verse = end_verse
+    public string Hide()
+    {
+        return new string('*', Text.Length);
+    }
+}
 
-    def __str__(self):
-        if self.end_verse:
-            return f"{self.book} {self.chapter}:{self.start_verse}-{self.end_verse}"
-        else:
-            return f"{self.book} {self.chapter}:{self.start_verse}"
+class Reference
+{
+    public string Book { get; }
+    public int Chapter { get; }
+    public int StartVerse { get; }
+    public int? EndVerse { get; }
 
-class Scripture:
-    def __init__(self, reference, text):
-        self.reference = reference
-        self.words = [Word(word) for word in text.split()]
+    public Reference(string book, int chapter, int startVerse, int? endVerse = null)
+    {
+        Book = book;
+        Chapter = chapter;
+        StartVerse = startVerse;
+        EndVerse = endVerse;
+    }
 
-    def hide_words(self):
-        hidden_indices = set()
+    public override string ToString()
+    {
+        if (EndVerse.HasValue)
+        {
+            return $"{Book} {Chapter}:{StartVerse}-{EndVerse}";
+        }
+        else
+        {
+            return $"{Book} {Chapter}:{StartVerse}";
+        }
+    }
+}
 
-        while len(hidden_indices) < len(self.words):
-            index = random.randint(0, len(self.words) - 1)
-            hidden_indices.add(index)
+class Scripture
+{
+    public Reference Reference { get; }
+    public List<Word> Words { get; }
 
-        for index in hidden_indices:
-            self.words[index] = Word(self.words[index].hide())
+    public Scripture(Reference reference, string text)
+    {
+        Reference = reference;
+        Words = new List<Word>(Array.ConvertAll(text.Split(' '), word => new Word(word)));
+    }
 
-    def is_all_hidden(self):
-        return all(word.text.startswith('*') for word in self.words)
+    public void HideWords()
+    {
+        Random random = new Random();
+        HashSet<int> hiddenIndices = new HashSet<int>();
 
-    def display(self):
-        hidden_scripture = ' '.join([word.text for word in self.words])
-        print(f"{self.reference} - {hidden_scripture}")
+        while (hiddenIndices.Count < Words.Count)
+        {
+            int index = random.Next(0, Words.Count);
+            hiddenIndices.Add(index);
+        }
 
-class Program:
-    @staticmethod
-    def main():
-        scripture_reference = Reference(book="John", chapter=3, start_verse=16)
-        scripture_text = "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."
-        scripture = Scripture(reference=scripture_reference, text=scripture_text)
+        foreach (int index in hiddenIndices)
+        {
+            Words[index] = new Word(Words[index].Hide());
+        }
+    }
 
-        while not scripture.is_all_hidden():
-            input("Press Enter to continue or type 'quit' to exit: ")
+    public bool IsAllHidden()
+    {
+        return Words.TrueForAll(word => word.Text.StartsWith("*"));
+    }
 
-            user_input = input().lower()
-            if user_input == 'quit':
-                break
+    public void Display()
+    {
+        string hiddenScripture = string.Join(' ', Words.ConvertAll(word => word.Text));
+        Console.WriteLine($"{Reference} - {hiddenScripture}");
+    }
+}
 
-            Program.console_clear()
-            scripture.hide_words()
-            scripture.display()
+class Program
+{
+    static void Main()
+    {
+        Reference scriptureReference = new Reference(book: "John", chapter: 3, startVerse: 16);
+        string scriptureText = "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.";
+        Scripture scripture = new Scripture(reference: scriptureReference, text: scriptureText);
 
-        print("Program ended.")
+        while (!scripture.IsAllHidden())
+        {
+            Console.WriteLine("Press Enter to continue or type 'quit' to exit:");
+            string userInput = Console.ReadLine().ToLower();
 
-    @staticmethod
-    def console_clear():
-        print("\033c", end="")  # ANSI escape code to clear console
+            if (userInput == "quit")
+            {
+                break;
+            }
 
-if __name__ == "__main__":
-    Program.main()
+            ConsoleClear();
+            scripture.HideWords();
+            scripture.Display();
+        }
+
+        Console.WriteLine("Program ended.");
+    }
+
+    static void ConsoleClear()
+    {
+        Console.Clear();
+    }
+}
