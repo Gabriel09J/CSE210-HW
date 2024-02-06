@@ -231,7 +231,7 @@ class ReflectionActivity : BaseActivity
         int durationInSeconds;
         if (int.TryParse(Console.ReadLine(), out durationInSeconds))
         {
-            Console.WriteLine("This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power youhave and how you can use it in other aspects of your life.”);
+Console.WriteLine("This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power you have and how you can use it in other aspects of your life.");
 DisplayAnimation(“Preparing to begin”, 3);
 Console.WriteLine($“Get ready to begin {Name}!”);
 DisplayAnimation(“Starting”, 3);
