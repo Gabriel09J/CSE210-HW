@@ -41,7 +41,7 @@ abstract class BaseActivity
         Description = description;
     }
 
-    public abstract void Perform(int durationInSeconds);
+    public abstract void Perform();
 
     protected void DisplayAnimation(string message, int seconds)
     {
@@ -105,8 +105,8 @@ class ActivityMenu
     {
         if (choice >= 1 && choice <= activities.Count)
         {
-            BaseActivitiy selectedActivity = activities[choice - 1];
-            selectedActivity.PerformActivity();
+            BaseActivity selectedActivity = activities[choice - 1];
+            selectedActivity.Perform();
         }
         else if (choice == ExitOption)
         {
@@ -123,13 +123,14 @@ class ExerciseActivity : BaseActivity
 {
     public ExerciseActivity(string name, string description) : base(name, description) { }
 
-    public override void Perform(int durationInSeconds)
+    public override void Perform()
     {
         Console.Clear();
 
         Console.WriteLine($"Starting {Name}.");
         Console.Write($"Enter duration in seconds for {Name}: ");
 
+        int durationInSeconds;
         if (int.TryParse(Console.ReadLine(), out durationInSeconds))
         {
             DisplayAnimation("Preparing to begin", 3);
@@ -154,13 +155,14 @@ class BreathingActivity : BaseActivity
 {
     public BreathingActivity(string name, string description) : base(name, description) { }
 
-    public override void Perform(int durationInSeconds)
+    public override void Perform()
     {
         Console.Clear();
 
         Console.WriteLine($"Starting {Name}.");
         Console.Write($"Enter duration in seconds for {Name}: ");
 
+        int durationInSeconds;
         if (int.TryParse(Console.ReadLine(), out durationInSeconds))
         {
             Console.WriteLine($"This activity will help you relax by walking you through breathing in and out slowly. Clear your mind and focus on your breathing.");
@@ -200,7 +202,7 @@ class BreathingActivity : BaseActivity
         {
             Console.Write($"{i} ");
             Thread.Sleep(1000);
-            Console.SetCursorPosition(Console.CursorLeft - 3, Console.CursorTop);
+            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
         }
 
         Console.WriteLine(); // Move to the next line after the countdown
@@ -219,19 +221,20 @@ class ReflectionActivity : BaseActivity
 
     public ReflectionActivity(string name, string description) : base(name, description) { }
 
-    public override void Perform(int durationInSeconds)
+    public override void Perform()
     {
         Console.Clear();
 
         Console.WriteLine($"Starting {Name}.");
         Console.Write($"Enter duration in seconds for {Name}: ");
 
+        int durationInSeconds;
         if (int.TryParse(Console.ReadLine(), out durationInSeconds))
         {
-            Console.WriteLine("This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power you have and how you can use itin other aspects of your life.");
+            Console.WriteLine("This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power youhave and how you can use it in other aspects of your life.”);
 DisplayAnimation(“Preparing to begin”, 3);
-        Console.WriteLine($"Get ready to begin {Name}!");
-        DisplayAnimation("Starting", 3);
+Console.WriteLine($“Get ready to begin {Name}!”);
+DisplayAnimation(“Starting”, 3);
 
         PerformRandomReflection(durationInSeconds);
 
@@ -246,9 +249,11 @@ DisplayAnimation(“Preparing to begin”, 3);
 
 private void PerformRandomReflection(int durationInSeconds)
 {
+    Random random = new Random();
+
     for (int i = 0; i < durationInSeconds; i++)
     {
-        string randomPrompt = reflectionPrompts[new Random().Next(reflectionPrompts.Length)];
+        string randomPrompt = reflectionPrompts[random.Next(reflectionPrompts.Length)];
         Console.WriteLine(randomPrompt);
         DisplaySpinner(3); // Spinner pause for 3 seconds
 
@@ -288,13 +293,14 @@ private string[] listeningPrompts =
 
 public ListeningActivity(string name, string description) : base(name, description) { }
 
-public override void Perform(int durationInSeconds)
+public override void Perform()
 {
     Console.Clear();
 
     Console.WriteLine($"Starting {Name}.");
     Console.Write($"Enter duration in seconds for {Name}: ");
 
+    int durationInSeconds;
     if (int.TryParse(Console.ReadLine(), out durationInSeconds))
     {
         Console.WriteLine("This activity will help you reflect on the good things in your life by having you list as many things as you can in a certain area.");
@@ -316,7 +322,8 @@ public override void Perform(int durationInSeconds)
 
 private void PerformListeningCycle(int durationInSeconds)
 {
-    string randomPrompt = listeningPrompts[new Random().Next(listeningPrompts.Length)];
+    Random random = new Random();
+    string randomPrompt = listeningPrompts[random.Next(listeningPrompts.Length)];
     Console.WriteLine(randomPrompt);
 
     DisplayCountdown(5); // Countdown of 5 seconds to begin thinking about the prompt
@@ -343,14 +350,16 @@ private void PerformListeningCycle(int durationInSeconds)
         Console.WriteLine(item);
     }
 }
+
 private void DisplayCountdown(int seconds)
 {
     for (int i = seconds; i > 0; i--)
     {
         Console.Write($"{i} ");
         Thread.Sleep(1000);
-        Console.SetCursorPosition(Console.CursorLeft - 3, Console.CursorTop);
+        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
     }
     Console.WriteLine(); // Move to the next line after the countdown
 }
+
 }
