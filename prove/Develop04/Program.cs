@@ -282,84 +282,83 @@ private void PerformRandomReflection(int durationInSeconds)
 
 class ListeningActivity : BaseActivity
 {
-private string[] listeningPrompts =
-{
-“Who are people that you appreciate?”,
-“What are personal strengths of yours?”,
-“Who are people that you have helped this week?”,
-“When have you felt the Holy Ghost this month?”,
-“Who are some of your personal heroes?”
-};
-
-public ListeningActivity(string name, string description) : base(name, description) { }
-
-public override void Perform()
-{
-    Console.Clear();
-
-    Console.WriteLine($"Starting {Name}.");
-    Console.Write($"Enter duration in seconds for {Name}: ");
-
-    int durationInSeconds;
-    if (int.TryParse(Console.ReadLine(), out durationInSeconds))
+    private string[] listeningPrompts =
     {
-        Console.WriteLine("This activity will help you reflect on the good things in your life by having you list as many things as you can in a certain area.");
-        DisplayAnimation("Preparing to begin", 3);
+        “Who are people that you appreciate?”,
+        “What are personal strengths of yours?”,
+        “Who are people that you have helped this week?”,
+        “When have you felt the Holy Ghost this month?”,
+        “Who are some of your personal heroes?”
+    };
 
-        Console.WriteLine($"Get ready to begin {Name}!");
-        DisplayAnimation("Starting", 3);
+    public ListeningActivity(string name, string description) : base(name, description) { }
 
-        PerformListeningCycle(durationInSeconds);
-
-        Console.WriteLine($"Good job! You completed {Name} for {durationInSeconds} seconds.");
-        DisplayAnimation("Completing", 3);
-    }
-    else
+    public override void Perform()
     {
-        Console.WriteLine("Invalid input. Please enter a valid number for duration.");
-    }
-}
+        Console.Clear();
 
-private void PerformListeningCycle(int durationInSeconds)
-{
-    Random random = new Random();
-    string randomPrompt = listeningPrompts[random.Next(listeningPrompts.Length)];
-    Console.WriteLine(randomPrompt);
+        Console.WriteLine($"Starting {Name}.");
+        Console.Write($"Enter duration in seconds for {Name}: ");
 
-    DisplayCountdown(5); // Countdown of 5 seconds to begin thinking about the prompt
-
-    Console.WriteLine("Now, list as many items as you can!");
-
-    List<string> userItems = new List<string>();
-
-    while (durationInSeconds > 0)
-    {
-        Console.Write("Enter an item (or type 'done' to finish): ");
-        string userEntry = Console.ReadLine();
-        if (userEntry.ToLower() == "done")
+        int durationInSeconds;
+        if (int.TryParse(Console.ReadLine(), out durationInSeconds))
         {
-            break;
+            Console.WriteLine("This activity will help you reflect on the good things in your life by having you list as many things as you can in a certain area.");
+            DisplayAnimation("Preparing to begin", 3);
+
+            Console.WriteLine($"Get ready to begin {Name}!");
+            DisplayAnimation("Starting", 3);
+
+            PerformListeningCycle(durationInSeconds);
+
+            Console.WriteLine($"Good job! You completed {Name} for {durationInSeconds} seconds.");
+            DisplayAnimation("Completing", 3);
         }
-        userItems.Add(userEntry);
-        durationInSeconds -= 1;
-        DisplaySpinner(3); // Spinner pause for 3 seconds
+        else
+        {
+            Console.WriteLine("Invalid input. Please enter a valid number for duration.");
+        }
     }
-    Console.WriteLine($"You listed {userItems.Count} items:");
-    foreach (var item in userItems)
-    {
-        Console.WriteLine(item);
-    }
-}
 
-private void DisplayCountdown(int seconds)
-{
-    for (int i = seconds; i > 0; i--)
+    private void PerformListeningCycle(int durationInSeconds)
     {
-        Console.Write($"{i} ");
-        Thread.Sleep(1000);
-        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-    }
-    Console.WriteLine(); // Move to the next line after the countdown
-}
+        Random random = new Random();
+        string randomPrompt = listeningPrompts[random.Next(listeningPrompts.Length)];
+        Console.WriteLine(randomPrompt);
 
+        DisplayCountdown(5); // Countdown of 5 seconds to begin thinking about the prompt
+
+        Console.WriteLine("Now, list as many items as you can!");
+
+        List<string> userItems = new List<string>();
+
+        while (durationInSeconds > 0)
+        {
+            Console.Write("Enter an item (or type 'done' to finish): ");
+            string userEntry = Console.ReadLine();
+            if (userEntry.ToLower() == "done")
+            {
+                break;
+            }
+            userItems.Add(userEntry);
+            durationInSeconds -= 1;
+            DisplaySpinner(3); // Spinner pause for 3 seconds
+        }
+        Console.WriteLine($"You listed {userItems.Count} items:");
+        foreach (var item in userItems)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
+    private void DisplayCountdown(int seconds)
+    {
+        for (int i = seconds; i > 0; i--)
+        {
+            Console.Write($"{i} ");
+            Thread.Sleep(1000);
+            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+        }
+        Console.WriteLine(); // Move to the next line after the countdown
+    }
 }
